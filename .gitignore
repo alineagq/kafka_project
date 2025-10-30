@@ -1,0 +1,23 @@
+# Logs
+*.log
+test.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# Environment files
+.env.local
+.env.*.local

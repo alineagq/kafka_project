@@ -1,0 +1,38 @@
+# Prometheus configuration file
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds
+  evaluation_interval: 15s # Evaluate rules every 15 seconds
+
+  external_labels:
+    monitor: 'kafka-monitor'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Kafka Controllers - JMX Exporter metrics
+  - job_name: 'kafka-controllers'
+    static_configs:
+      - targets:
+          - 'controller1:7071'
+          - 'controller2:7071'
+          - 'controller3:7071'
+        labels:
+          env: 'development'
+          cluster: 'kafka-kraft-cluster'
+          role: 'controller'
+
+  # Kafka Brokers - JMX Exporter metrics
+  - job_name: 'kafka-brokers'
+    static_configs:
+      - targets:
+          - 'broker1:7071'
+          - 'broker2:7071'
+          - 'broker3:7071'
+        labels:
+          env: 'development'
+          cluster: 'kafka-kraft-cluster'
+          role: 'broker'

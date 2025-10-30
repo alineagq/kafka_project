@@ -1,0 +1,4 @@
+# Dependências Python para produzir eventos no Kafka
+# Usando kafka-python-ng que é compatível com Python 3.13
+
+kafka-python-ng>=2.2.0
