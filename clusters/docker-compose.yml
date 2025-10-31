@@ -24,7 +24,7 @@ services:
       - "17071:7071"
     volumes:
       - controller1-data:/var/lib/kafka/data
-      - ./jmx-exporter:/opt/jmx_exporter
+      - ../metrics/jmx-exporter:/opt/jmx_exporter
 
   controller2:
     image: confluentinc/cp-kafka:latest
@@ -47,7 +47,7 @@ services:
       - "17072:7071"
     volumes:
       - controller2-data:/var/lib/kafka/data
-      - ./jmx-exporter:/opt/jmx_exporter
+      - ../metrics/jmx-exporter:/opt/jmx_exporter
 
   controller3:
     image: confluentinc/cp-kafka:latest
@@ -70,7 +70,7 @@ services:
       - "17073:7071"
     volumes:
       - controller3-data:/var/lib/kafka/data
-      - ./jmx-exporter:/opt/jmx_exporter
+      - ../metrics/jmx-exporter:/opt/jmx_exporter
 
   # Brokers (KRaft brokers)
   broker1:
@@ -101,7 +101,7 @@ services:
       - controller3
     volumes:
       - broker1-data:/var/lib/kafka/data
-      - ./jmx-exporter:/opt/jmx_exporter
+      - ../metrics/jmx-exporter:/opt/jmx_exporter
 
   broker2:
     image: confluentinc/cp-kafka:latest
@@ -131,7 +131,7 @@ services:
       - controller3
     volumes:
       - broker2-data:/var/lib/kafka/data
-      - ./jmx-exporter:/opt/jmx_exporter
+      - ../metrics/jmx-exporter:/opt/jmx_exporter
 
   broker3:
     image: confluentinc/cp-kafka:latest
@@ -161,7 +161,7 @@ services:
       - controller3
     volumes:
       - broker3-data:/var/lib/kafka/data
-      - ./jmx-exporter:/opt/jmx_exporter
+      - ../metrics/jmx-exporter:/opt/jmx_exporter
 
   # AKHQ (formerly known as KafkaHQ) - Kafka GUI
   akhq:
@@ -319,7 +319,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../metrics/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     depends_on:
       - broker1
@@ -338,8 +338,8 @@ services:
       - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../metrics/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../metrics/grafana/datasources:/etc/grafana/provisioning/datasources
     depends_on:
       - prometheus
 

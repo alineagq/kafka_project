@@ -39,7 +39,7 @@ wait_for_service() {
 
 # 1. Verificar se os serviços estão rodando
 echo -e "${YELLOW}[1/8] Verificando serviços...${NC}"
-if ! podman-compose ps | grep -q "Up"; then
+if ! podman ps | grep -q "Up"; then
     echo -e "${RED}✗ Serviços não estão rodando!${NC}"
     echo -e "${YELLOW}Execute: podman-compose up -d${NC}"
     exit 1
@@ -59,7 +59,7 @@ echo ""
 
 # 4. Criar tópico
 echo -e "${YELLOW}[4/8] Criando tópico 'events'...${NC}"
-if podman exec broker1 kafka-topics --list --bootstrap-server localhost:9092 | grep -q "^events$"; then
+if podman exec --env KAFKA_OPTS='' broker1 sh -c 'kafka-topics --list --bootstrap-server localhost:9092' | grep -q "^events$"; then
     echo -e "${YELLOW}⚠ Tópico 'events' já existe${NC}"
 else
     podman exec broker1 kafka-topics --create \
@@ -82,7 +82,7 @@ fi
 
 curl -s -X POST \
     -H "Content-Type: application/json" \
-    --data @s3-sink-connector.json \
+    --data @../connects/s3-sink-connector.json \
     http://localhost:8083/connectors > /dev/null
 
 # Aguardar conector ficar RUNNING
@@ -103,12 +103,13 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 for i in {1..5}; do
     MESSAGE="{\"id\":$i,\"type\":\"test_event\",\"message\":\"Test message $i\",\"timestamp\":\"$TIMESTAMP\"}"
-    echo "$MESSAGE" | podman exec -i broker1 kafka-console-producer \
+    echo "$MESSAGE" | podman exec -i --env KAFKA_OPTS='' broker1 kafka-console-producer \
         --bootstrap-server localhost:9092 \
         --topic events > /dev/null 2>&1
     echo -e "  ${GREEN}✓${NC} Enviada mensagem $i"
 done
 echo ""
+
 
 # 7. Aguardar flush e verificar S3
 echo -e "${YELLOW}[7/8] Aguardando flush para S3 (15 segundos)...${NC}"

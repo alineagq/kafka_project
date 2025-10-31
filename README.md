@@ -2,6 +2,8 @@
 
 Este projeto contém um cluster Kafka completo com KRaft (sem Zookeeper), Kafka Connect S3 Sink, LocalStack para testes S3 locais, e monitoramento via Prometheus.
 
+> 📁 **Estrutura do Projeto**: Este projeto está organizado em pastas modulares. Veja [STRUCTURE.md](STRUCTURE.md) para detalhes da estrutura e use o script helper `./kafka.sh help` para comandos rápidos.
+
 ## 🏗️ Arquitetura
 
 ### Kafka Cluster
@@ -52,23 +54,31 @@ O guia completo inclui:
 
 ```bash
 # 1. Subir toda a infraestrutura
-podman-compose up -d
+cd clusters/
+docker compose up -d
+
+# Ou use o helper script:
+./kafka.sh start
 
 # 2. Aguardar serviços iniciarem (30-60 segundos)
 sleep 60
 
 # 3. Criar tópico 'events'
-podman exec -it broker-1 kafka-topics --create \
+docker exec -it broker1 kafka-topics --create \
     --bootstrap-server localhost:9092 \
     --topic events \
     --partitions 3 \
     --replication-factor 3
 
 # 4. Criar conector S3 Sink
+cd connects/
 ./s3-connector.sh create
 
+# Ou use o helper:
+./kafka.sh connector-create
+
 # 5. Produzir mensagens de teste
-podman exec -it broker-1 kafka-console-producer \
+docker exec -it broker1 kafka-console-producer \
     --bootstrap-server localhost:9092 \
     --topic events
 
@@ -79,13 +89,34 @@ podman exec -it broker-1 kafka-console-producer \
 # Pressione Ctrl+C para sair
 
 # 6. Verificar arquivos no S3 LocalStack
+cd connects/
 ./s3-connector.sh show-s3
+
+# Ou use o helper:
+./kafka.sh s3-list
+```
+
+### Usar o Script Helper
+
+O projeto inclui um script helper para facilitar comandos comuns:
+
+```bash
+# Ver todos os comandos disponíveis
+./kafka.sh help
+
+# Exemplos de uso:
+./kafka.sh start              # Inicia o cluster
+./kafka.sh test-connection    # Testa conectividade
+./kafka.sh run-producer       # Executa producer de exemplo
+./kafka.sh connector-status   # Status do S3 connector
+./kafka.sh metrics            # Mostra URLs de métricas
 ```
 
 ### Gerenciar Conector S3
 
 ```bash
 # Ver status
+cd connects/
 ./s3-connector.sh status
 
 # Listar arquivos S3
